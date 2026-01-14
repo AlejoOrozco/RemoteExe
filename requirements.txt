@@ -1,0 +1,12 @@
+# Python dependencies for RemoteExe
+# Install with: pip install -r requirements.txt
+#
+# Note: For building the Windows executable, you'll also need:
+# pip install pyinstaller
+
+# No external dependencies required for basic functionality!
+# Python standard library is sufficient.
+#
+# However, if you want to add features later, you might need:
+# cryptography  # For encryption (optional)
+# psutil        # For system information (optional)

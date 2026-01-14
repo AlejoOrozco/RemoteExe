@@ -1,0 +1,7 @@
+{
+  "port": 8888,
+  "password": "RemoteExe4414",
+  "discovery_port": 8889,
+  "timeout": 30,
+  "max_connections": 5
+}
