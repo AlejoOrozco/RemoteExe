@@ -200,11 +200,14 @@ def start_server(config, logger):
     
     logger.info(f"Listener started on port {port}")
     logger.info("Waiting for connections...")
-    print(f"\n{'='*60}")
-    print(f"RemoteExe Listener is running on port {port}")
-    print(f"Discovery enabled on UDP port {config.get('discovery_port', 8889)}")
-    print(f"Waiting for commands from broadcaster...")
-    print(f"{'='*60}\n")
+    
+    # Only print to console if not in background mode
+    if sys.stdout.isatty():
+        print(f"\n{'='*60}")
+        print(f"RemoteExe Listener is running on port {port}")
+        print(f"Discovery enabled on UDP port {config.get('discovery_port', 8889)}")
+        print(f"Waiting for commands from broadcaster...")
+        print(f"{'='*60}\n")
     
     while True:
         try:
@@ -214,7 +217,8 @@ def start_server(config, logger):
         
         except KeyboardInterrupt:
             logger.info("Server stopped by user")
-            print("\nShutting down listener...")
+            if sys.stdout.isatty():
+                print("\nShutting down listener...")
             break
         except Exception as e:
             logger.error(f"Server error: {str(e)}")
@@ -222,21 +226,47 @@ def start_server(config, logger):
     
     server_socket.close()
 
-def main():
-    print("Starting RemoteExe Listener...")
-    config = load_config()
+def is_running_in_background():
+    """
+    Detects if the script is running in background (no console).
+    Returns True if running in background, False if in foreground.
+    """
+    # Check if running with pythonw.exe (Windows background mode)
+    if sys.executable.endswith('pythonw.exe'):
+        return True
     
+    # Check if stdout is redirected (background process)
+    try:
+        # If we can't access the terminal, we're in background
+        if not sys.stdout.isatty():
+            return True
+    except:
+        pass
+    
+    return False
+
+def main():
+    # Check if running in background
+    background_mode = is_running_in_background()
+    
+    if not background_mode:
+        print("Starting RemoteExe Listener...")
+    
+    config = load_config()
     logger = setup_logging()
     
     logger.info("="*60)
     logger.info("RemoteExe Listener starting...")
     logger.info(f"Port: {config['port']}")
     logger.info(f"Password: {'*' * len(config['password'])}")
+    logger.info(f"Background mode: {background_mode}")
+    
     try:
         start_server(config, logger)
     except Exception as e:
         logger.error(f"Fatal error: {str(e)}")
-        print(f"Fatal error: {str(e)}")
+        if not background_mode:
+            print(f"Fatal error: {str(e)}")
         sys.exit(1)
 
 if __name__ == '__main__':
