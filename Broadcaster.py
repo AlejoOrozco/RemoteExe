@@ -199,9 +199,24 @@ def main():
         choice = input("\nEnter IP address manually? (y/n): ").strip().lower()
         
         if choice == 'y':
-            ip = input("Enter IP address: ").strip()
-            port = config['port']
+            ip = input(f"Enter IP address (default port {config['port']}): ").strip()
+            
+            # Allow user to specify IP:PORT or just IP
+            if ':' in ip:
+                # User specified IP:PORT format
+                parts = ip.split(':')
+                ip = parts[0].strip()
+                try:
+                    port = int(parts[1].strip())
+                except ValueError:
+                    print(f"Invalid port, using default {config['port']}")
+                    port = config['port']
+            else:
+                # Just IP, use default port from config
+                port = config['port']
+            
             listeners = [(ip, port)]
+            print(f"Connecting to {ip}:{port}")
         else:
             print("Exiting...")
             return
